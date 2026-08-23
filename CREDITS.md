@@ -11,8 +11,13 @@ This repository is a personal Starship config. Credit for the tools and theme be
 
 - **MesloLGS Nerd Font** — patched Meslo faces distributed for Powerlevel10k ([romkatv/powerlevel10k-media](https://github.com/romkatv/powerlevel10k-media)); based on [Nerd Fonts](https://github.com/ryanoasis/nerd-fonts) / Meslo LG
 
+## Homebrew & eza
+
+- **Homebrew** — the Homebrew maintainers ([Homebrew/brew](https://github.com/Homebrew/brew), [brew.sh](https://brew.sh/))
+- **eza** — a modern `ls` replacement ([eza-community/eza](https://github.com/eza-community/eza))
+
 ## Keeping credits current
 
 If this repo gains a new upstream dependency or CLI tool, list it in this file in the same change that introduces it.
 
-All trademarks and project names belong to their respective owners. This repo is not affiliated with or endorsed by Starship or Catppuccin.
+All trademarks and project names belong to their respective owners. This repo is not affiliated with or endorsed by Starship, Catppuccin, Homebrew, or eza.

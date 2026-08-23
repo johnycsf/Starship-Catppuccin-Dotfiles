@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
-# Install Starship (if missing), MesloLGS Nerd Font, starship.toml, and wire up bash and/or zsh.
+# Install Starship (if missing), MesloLGS Nerd Font, starship.toml, Homebrew, eza,
+# an enhanced `ls` alias, and wire up bash and/or zsh.
 set -euo pipefail
 
 REPO_RAW="https://raw.githubusercontent.com/johnycsf/Starship-Catppuccin-Dotfiles/main/starship.toml"
 MARKER="# starship (johnycsf/Starship-Catppuccin-Dotfiles)"
+LS_ALIAS_MARKER="# eza ls (johnycsf/Starship-Catppuccin-Dotfiles)"
+LS_ALIAS="alias ls='eza -lh --icons --git --hyperlink --header'"
 # Non-Mono MesloLGS NF — OS icons render at full size (Mono variants scale them down).
 FONT_BASE_URL="https://github.com/romkatv/powerlevel10k-media/raw/master"
 FONT_FILES=(
@@ -12,8 +15,40 @@ FONT_FILES=(
   "MesloLGS NF Italic.ttf"
   "MesloLGS NF Bold Italic.ttf"
 )
+BREW_PREFIXES=(/opt/homebrew /usr/local /home/linuxbrew/.linuxbrew)
 
 die() { echo "error: $*" >&2; exit 1; }
+
+# Put brew on PATH for this script if it is installed but not yet exported.
+load_brew_into_shell() {
+  if command -v brew >/dev/null 2>&1; then
+    return 0
+  fi
+  local prefix
+  for prefix in "${BREW_PREFIXES[@]}"; do
+    if [[ -x "${prefix}/bin/brew" ]]; then
+      # shellcheck disable=SC1091
+      eval "$("${prefix}/bin/brew" shellenv)"
+      return 0
+    fi
+  done
+  return 1
+}
+
+brew_bin_path() {
+  local prefix
+  if command -v brew >/dev/null 2>&1; then
+    command -v brew
+    return 0
+  fi
+  for prefix in "${BREW_PREFIXES[@]}"; do
+    if [[ -x "${prefix}/bin/brew" ]]; then
+      echo "${prefix}/bin/brew"
+      return 0
+    fi
+  done
+  return 1
+}
 
 ensure_starship() {
   local bin_dir="${HOME}/.local/bin"
@@ -104,6 +139,102 @@ install_config() {
   fi
 }
 
+# Install Homebrew if missing (Linux / macOS / WSL). Uses NONINTERACTIVE=1.
+ensure_homebrew() {
+  load_brew_into_shell || true
+
+  if command -v brew >/dev/null 2>&1; then
+    echo "Homebrew already installed: $(command -v brew)"
+    return 0
+  fi
+
+  command -v curl >/dev/null 2>&1 || die "curl is required to install Homebrew"
+  echo "Homebrew not found; installing via https://brew.sh (NONINTERACTIVE)..."
+  NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+  load_brew_into_shell || true
+  if ! command -v brew >/dev/null 2>&1; then
+    die "Homebrew install finished but brew not found on PATH; open a new terminal and re-run"
+  fi
+  echo "Installed Homebrew: $(command -v brew)"
+}
+
+# Ensure brew shellenv is sourced from the shell rc so eza stays on PATH.
+ensure_brew_in_rc() {
+  local rc="$1"
+  local brew_bin
+
+  [[ -f "$rc" ]] || return 0
+  if grep -Fq 'brew shellenv' "$rc" 2>/dev/null; then
+    return 0
+  fi
+
+  brew_bin="$(brew_bin_path)" || return 0
+
+  {
+    echo ""
+    echo "$MARKER — Homebrew"
+    echo "eval \"\$(${brew_bin} shellenv)\""
+  } >>"$rc"
+  echo "Added Homebrew to PATH in $rc"
+}
+
+# Install eza via Homebrew if missing.
+ensure_eza() {
+  load_brew_into_shell || true
+
+  if command -v eza >/dev/null 2>&1; then
+    echo "eza already installed: $(command -v eza)"
+    return 0
+  fi
+
+  command -v brew >/dev/null 2>&1 || die "brew is required to install eza"
+  echo "Installing eza via Homebrew..."
+  brew install eza
+
+  load_brew_into_shell || true
+  if ! command -v eza >/dev/null 2>&1; then
+    die "eza install finished but binary not found on PATH"
+  fi
+  echo "Installed eza: $(command -v eza)"
+}
+
+# Create or replace the ls alias so it uses eza with icons/git/hyperlinks.
+ensure_ls_alias() {
+  local rc="$1"
+  local tmp
+
+  [[ -f "$rc" ]] || return 0
+
+  if grep -Fq "$LS_ALIAS" "$rc" 2>/dev/null; then
+    echo "ls alias already set: $rc"
+    return 0
+  fi
+
+  tmp="$(mktemp)"
+  if grep -Eq '^[[:space:]]*alias ls=' "$rc" 2>/dev/null; then
+    awk -v line="$LS_ALIAS" '
+      /^[[:space:]]*alias ls=/ {
+        if (!replaced) { print line; replaced = 1 }
+        next
+      }
+      { print }
+    ' "$rc" >"$tmp"
+    mv "$tmp" "$rc"
+    echo "Updated ls alias in $rc"
+    return 0
+  fi
+
+  {
+    cat "$rc"
+    echo ""
+    echo "$LS_ALIAS_MARKER"
+    echo "$LS_ALIAS"
+  } >"$tmp"
+  mv "$tmp" "$rc"
+  echo "Added ls alias to $rc"
+}
+
 # Ensure ~/.local/bin is on PATH in the shell rc (needed when Starship is installed there).
 ensure_local_bin_path() {
   local rc="$1"
@@ -136,6 +267,8 @@ ensure_init() {
   fi
 
   ensure_local_bin_path "$rc"
+  ensure_brew_in_rc "$rc"
+  ensure_ls_alias "$rc"
 
   if grep -Fq 'starship init' "$rc" 2>/dev/null; then
     echo "Already configured: $rc"
@@ -180,6 +313,8 @@ main() {
   ensure_starship
   install_nerd_font
   install_config
+  ensure_homebrew
+  ensure_eza
 
   while IFS= read -r shell; do
     case "$shell" in
@@ -191,6 +326,7 @@ main() {
   echo
   echo "Done. Open a new terminal (or: source ~/.bashrc / source ~/.zshrc)."
   echo "If icons still look like boxes, set the terminal font to MesloLGS NF and restart the terminal."
+  echo "ls is aliased to eza (long listing with icons, git status, hyperlinks, and a header)."
 }
 
 main "$@"
