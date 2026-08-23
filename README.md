@@ -39,7 +39,9 @@ That will:
 1. Install **Starship** if it is missing
 2. Install **MesloLGS Nerd Font** into your user fonts folder (Linux / macOS / WSL)
 3. Install this `starship.toml`
-4. Wire up bash and/or zsh
+4. Install **Homebrew** if missing, then install **eza**
+5. Set `ls` to `eza -lh --icons --git --hyperlink --header` (creates or replaces an existing `ls` alias)
+6. Wire up bash and/or zsh (including Homebrew on `PATH`)
 
 **After install:** set your terminal’s font to **MesloLGS NF** (not a Mono variant), then open a new terminal. Without that step, OS icons show as boxes or tofu.
 
@@ -67,8 +69,9 @@ curl -fsSL https://raw.githubusercontent.com/johnycsf/Starship-Catppuccin-Dotfil
 
 The installer will:
 
-- Install Starship to `~/.local/bin` (no Homebrew required)
+- Install Starship to `~/.local/bin`
 - Install **MesloLGS NF** into `~/Library/Fonts`
+- Install **Homebrew** (if missing) and **eza**, then set the enhanced `ls` alias
 - Update `~/.zshrc` and/or `~/.bashrc`
 
 **Set your terminal font to MesloLGS NF**, then open a new window:
