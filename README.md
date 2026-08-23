@@ -28,13 +28,18 @@ If this stack saved you setup time, please consider sponsoring — it funds:
 
 ## Quick install
 
-Use a **non-Mono** Nerd Font in your terminal (e.g. `MesloLGS Nerd Font`) so OS icons are full size, then run:
-
 ```bash
 curl -fsSL https://raw.githubusercontent.com/johnycsf/Starship-Catppuccin-Dotfiles/main/install.sh | bash
 ```
 
-That installs Starship if needed, drops in this config, and wires up bash and/or zsh.
+That will:
+
+1. Install **Starship** if it is missing
+2. Install **MesloLGS Nerd Font** into your user fonts folder (Linux / macOS / WSL)
+3. Install this `starship.toml`
+4. Wire up bash and/or zsh
+
+**After install:** set your terminal’s font to **MesloLGS NF** (not a Mono variant), then open a new terminal. Without that step, OS icons show as boxes or tofu.
 
 Or clone and run locally:
 
@@ -48,10 +53,21 @@ cd Starship-Catppuccin-Dotfiles
 
 Open a new terminal (or `source ~/.bashrc` / `source ~/.zshrc`).
 
+### Already installed but missing icons?
+
+Re-run the installer (it skips Starship/config if present and still installs the font):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/johnycsf/Starship-Catppuccin-Dotfiles/main/install.sh | bash
+```
+
+Then pick **MesloLGS NF** in your terminal settings (Cursor, VS Code, Windows Terminal, iTerm, GNOME Terminal, etc.).
+
 ## Manual install
 
 1. Install Starship: https://starship.rs/guide/#%F0%9F%9A%80-installation
-2. Copy the config:
+2. Install [MesloLGS Nerd Font](https://github.com/romkatv/powerlevel10k#meslo-nerd-font-patched-for-powerlevel10k) and set it as your terminal font
+3. Copy the config:
 
 ```bash
 mkdir -p ~/.config
@@ -59,7 +75,7 @@ curl -fsSL https://raw.githubusercontent.com/johnycsf/Starship-Catppuccin-Dotfil
   -o ~/.config/starship.toml
 ```
 
-3. Add **one** of these to your shell rc:
+4. Add **one** of these to your shell rc:
 
 **bash** (`~/.bashrc`):
 
