@@ -8,7 +8,7 @@
 
 My [Starship](https://starship.rs/) prompt config (Catppuccin Mocha).
 
-**Starship + Catppuccin Mocha** — one-liner install for bash/zsh.
+**Starship + Catppuccin Mocha** — one-liner install for bash/zsh on **Linux, macOS, and WSL**.
 
 Works with **bash** and **zsh**.
 
@@ -16,15 +16,17 @@ Works with **bash** and **zsh**.
 
 ## Support this work
 
-If this stack saved you setup time, please consider sponsoring — it funds:
+**If this prompt helped you — or saved you time — please consider [sponsoring or donating](https://github.com/sponsors/johnycsf).** Your support keeps dotfiles and homelab tools maintained for everyone.
 
-- Keeping install/update/backup scripts working across common Linux distros
-- Testing safe upgrades against **official** upstream images
-- Building more beginner-friendly stacks that share the same `./manage.sh` UX
+Your sponsorship funds:
+
+- Keeping the installer working on **Linux, macOS, and WSL**
+- Updating the Catppuccin theme as Starship releases new features
+- More beginner-friendly configs and homelab stacks
 
 [![Sponsor johnycsf](https://img.shields.io/badge/GitHub%20Sponsors-Donate-ea4aaa?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/johnycsf)
 
-👉 **[github.com/sponsors/johnycsf](https://github.com/sponsors/johnycsf)**
+👉 **[github.com/sponsors/johnycsf](https://github.com/sponsors/johnycsf)** — even a small monthly sponsorship helps keep development going.
 
 ## Quick install
 
@@ -52,6 +54,33 @@ cd Starship-Catppuccin-Dotfiles
 ```
 
 Open a new terminal (or `source ~/.bashrc` / `source ~/.zshrc`).
+
+## macOS
+
+Fully supported on **macOS** (Intel and Apple Silicon). The default shell is **zsh**; bash works too.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/johnycsf/Starship-Catppuccin-Dotfiles/main/install.sh | bash
+# or zsh only:
+./install.sh zsh
+```
+
+The installer will:
+
+- Install Starship to `~/.local/bin` (no Homebrew required)
+- Install **MesloLGS NF** into `~/Library/Fonts`
+- Update `~/.zshrc` and/or `~/.bashrc`
+
+**Set your terminal font to MesloLGS NF**, then open a new window:
+
+| Terminal | Font setting |
+|----------|----------------|
+| **iTerm2** | Settings → Profiles → Text → Font |
+| **Terminal.app** | Settings → Profiles → Font |
+| **Cursor / VS Code** | Settings → Terminal › Integrated: Font Family |
+| **Warp** | Settings → Appearance → Text → Font |
+
+Without the Nerd Font, OS icons in the prompt show as boxes or tofu.
 
 ### Already installed but missing icons?
 
